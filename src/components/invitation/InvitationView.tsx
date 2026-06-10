@@ -31,7 +31,50 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
   const isDragging = useRef(false)
   const dragOffset = useRef({ x: 0, y: 0 })
 
-  const handleMouseDown = (_e: React.MouseEvent) => {}
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!isDragMode || !heroRef.current || !letteringRef.current || !onPositionChange) return
+    e.preventDefault()
+
+    const hr = heroRef.current.getBoundingClientRect()
+    const lr = letteringRef.current.getBoundingClientRect()
+
+    // 포인터와 레터링 중심 사이의 오프셋 기록
+    dragOffset.current = {
+      x: e.clientX - (lr.left + lr.width / 2),
+      y: e.clientY - (lr.top + lr.height / 2),
+    }
+    isDragging.current = true
+
+    const onMove = (ev: MouseEvent) => {
+      if (!isDragging.current || !heroRef.current || !letteringRef.current) return
+      const hr = heroRef.current.getBoundingClientRect()
+      const lr = letteringRef.current.getBoundingClientRect()
+      const halfW = lr.width / 2
+      const halfH = lr.height / 2
+
+      // 히어로 기준 새 중심 좌표 (포인터 - 오프셋 - 히어로 원점)
+      const rawX = ev.clientX - dragOffset.current.x - hr.left
+      const rawY = ev.clientY - dragOffset.current.y - hr.top
+
+      // 히어로 영역 내로 clamp (블록 절반 크기만큼 여백)
+      const cx = Math.max(halfW, Math.min(hr.width - halfW, rawX))
+      const cy = Math.max(halfH, Math.min(hr.height - halfH, rawY))
+
+      onPositionChange(
+        Math.round((cx / hr.width) * 100),
+        Math.round((cy / hr.height) * 100),
+      )
+    }
+
+    const onUp = () => {
+      isDragging.current = false
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   const tpl = TEMPLATES.find((t) => t.id === data.templateId) ?? TEMPLATES[0]
   const accent = data.accentColor || tpl.accentColor
