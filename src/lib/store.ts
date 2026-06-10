@@ -29,17 +29,23 @@ const DEFAULT: InvitationData = {
 interface Store {
   data: InvitationData
   activeSection: string
+  savedId: string | null
+  editToken: string | null
   update: (patch: Partial<InvitationData>) => void
   setTemplate: (id: TemplateId) => void
   setSection: (s: string) => void
+  setSaved: (id: string, token: string) => void
   reset: () => void
 }
 
 export const useStore = create<Store>((set) => ({
   data: DEFAULT,
   activeSection: 'template',
+  savedId: null,
+  editToken: null,
   update: (patch) => set((s) => ({ data: { ...s.data, ...patch } })),
   setTemplate: (id) => set((s) => ({ data: { ...s.data, templateId: id } })),
   setSection: (section) => set({ activeSection: section }),
-  reset: () => set({ data: DEFAULT }),
+  setSaved: (id, token) => set({ savedId: id, editToken: token }),
+  reset: () => set({ data: DEFAULT, savedId: null, editToken: null }),
 }))
