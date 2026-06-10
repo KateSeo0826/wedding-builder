@@ -35,7 +35,6 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
     if (!isDragMode || !heroRef.current || !letteringRef.current || !onPositionChange) return
     e.preventDefault()
 
-    const hr = heroRef.current.getBoundingClientRect()
     const lr = letteringRef.current.getBoundingClientRect()
 
     // 포인터와 레터링 중심 사이의 오프셋 기록
