@@ -70,10 +70,12 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
       isDragging.current = false
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
+      window.removeEventListener('mouseleave', onUp)
     }
 
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
+    window.addEventListener('mouseleave', onUp)
   }
 
   const tpl = TEMPLATES.find((t) => t.id === data.templateId) ?? TEMPLATES[0]
