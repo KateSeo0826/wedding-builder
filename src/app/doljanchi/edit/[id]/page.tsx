@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 import DoljanchiLoader from '@/components/doljanchi/DoljanchiLoader'
 import { DoljanchiData } from '@/types/doljanchi'
 
@@ -17,7 +17,7 @@ export default async function DoljanchiEditPage({
   let editToken: string | null = null
 
   if (id !== 'draft') {
-    const { data } = await supabase
+    const { data } = await createServerClient()
       .from('invitations')
       .select('data')
       .eq('id', id)

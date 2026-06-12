@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 import EditLoader from '@/components/builder/EditLoader'
 import { InvitationData } from '@/types/invitation'
 
@@ -18,7 +18,7 @@ export default async function EditPage({
 
   // id가 'draft'가 아닐 때만 Supabase에서 불러옴
   if (id !== 'draft') {
-    const { data } = await supabase
+    const { data } = await createServerClient()
       .from('invitations')
       .select('data')
       .eq('id', id)

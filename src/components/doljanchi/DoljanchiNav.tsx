@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useDoljanchiStore } from '@/lib/doljanchi-store'
 import { Copy, Check, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { uploadPhotos } from '@/lib/uploadPhoto'
 
 function getOrigin() {
   if (typeof window === 'undefined') return ''
@@ -38,20 +39,22 @@ export default function DoljanchiNav() {
   const save = async (showModal: boolean) => {
     setSaving(true)
     try {
-      const { photos: _p, ...dataWithoutPhotos } = data
-      void _p
+      // Upload any blob/data URLs to Supabase Storage
+      const uploadedPhotos = await uploadPhotos(data.photos ?? [], `doljanchi-${data.id || 'new'}`)
+      const dataToSave = { ...data, photos: uploadedPhotos }
+
       if (savedId && editToken) {
         await fetch(`/api/doljanchi/${savedId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: dataWithoutPhotos, edit_token: editToken }),
+          body: JSON.stringify({ data: dataToSave, edit_token: editToken }),
         })
         if (showModal) setModal(true)
       } else {
         const res = await fetch('/api/doljanchi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: dataWithoutPhotos }),
+          body: JSON.stringify({ data: dataToSave }),
         })
         const json = await res.json()
         if (json.id && json.edit_token) {
@@ -103,7 +106,7 @@ export default function DoljanchiNav() {
             {publicUrl && <LinkRow label="공개 링크" value={publicUrl} />}
             {editUrl && <LinkRow label="편집 링크 (보관용)" value={editUrl} />}
             <p className="text-[10px] text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mt-3">
-              사진은 공유되지 않습니다. 편집 링크를 잃으면 수정이 불가능합니다.
+              편집 링크를 잃으면 수정이 불가능합니다.
             </p>
             <button onClick={() => setModal(false)}
               className="mt-4 w-full py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors">

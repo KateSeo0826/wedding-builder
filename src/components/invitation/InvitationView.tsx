@@ -80,8 +80,8 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
   const tpl = TEMPLATES.find((t) => t.id === data.templateId) ?? TEMPLATES[0]
   const accent = data.accentColor || tpl.accentColor
 
-  const heroPhoto = data.photos[0]
-  const galleryPhotos = data.photos.slice(1, 5).filter(Boolean)
+  const heroPhoto = (data.photos ?? [])[0]
+  const galleryPhotos = (data.photos ?? []).slice(1, 5).filter(Boolean)
 
   const isDark = tpl.id === 'poster-dark' || tpl.id === 'film'
 

@@ -5,13 +5,14 @@ import { InvitationData } from '@/types/invitation'
 export async function POST(req: NextRequest) {
   const body = await req.json() as { data: InvitationData }
 
-  // blob URL인 사진은 다른 기기에서 동작하지 않으므로 제거
-  const { photos: _photos, ...dataWithoutPhotos } = body.data
+  // blob: URL은 서버에서도 차단 (혹시 남아있을 경우 제거)
+  const photos = (body.data.photos ?? []).filter((u: string) => !u.startsWith('blob:'))
+  const dataToSave = { ...body.data, photos }
 
   const db = createServerClient()
   const { data, error } = await db
     .from('invitations')
-    .insert({ data: dataWithoutPhotos })
+    .insert({ data: dataToSave })
     .select('id, edit_token')
     .single()
 

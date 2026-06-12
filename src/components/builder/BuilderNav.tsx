@@ -4,6 +4,7 @@ import { useStore } from '@/lib/store'
 import { Eye, Share2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { uploadPhotos } from '@/lib/uploadPhoto'
 
 export default function BuilderNav() {
   const { data, savedId, editToken, setSaved } = useStore()
@@ -15,11 +16,15 @@ export default function BuilderNav() {
   async function saveToServer(): Promise<{ id: string; token: string } | null> {
     setSaving(true)
     try {
+      // Upload any blob/data URLs to Supabase Storage, get permanent URLs
+      const uploadedPhotos = await uploadPhotos(data.photos ?? [], `wedding-${data.id || 'new'}`)
+      const dataToSave = { ...data, photos: uploadedPhotos }
+
       if (savedId && editToken) {
         const res = await fetch(`/api/invitations/${savedId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data, edit_token: editToken }),
+          body: JSON.stringify({ data: dataToSave, edit_token: editToken }),
         })
         if (!res.ok) throw new Error('저장 실패')
         return { id: savedId, token: editToken }
@@ -27,7 +32,7 @@ export default function BuilderNav() {
         const res = await fetch('/api/invitations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data }),
+          body: JSON.stringify({ data: dataToSave }),
         })
         if (!res.ok) throw new Error('저장 실패')
         const json = await res.json()
@@ -115,7 +120,7 @@ export default function BuilderNav() {
             </div>
 
             <p className="mt-4 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-              ⚠️ 사진은 공유되지 않습니다. 편집 링크를 꼭 따로 저장해 두세요.
+              ⚠️ 편집 링크를 꼭 따로 저장해 두세요.
             </p>
 
             <button

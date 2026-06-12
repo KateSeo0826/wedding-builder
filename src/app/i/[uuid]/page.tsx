@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 import InvitationView from '@/components/invitation/InvitationView'
 import { notFound } from 'next/navigation'
 import { InvitationData } from '@/types/invitation'
@@ -10,7 +10,7 @@ export default async function PublicInvitationPage({
 }) {
   const { uuid } = await params
 
-  const { data, error } = await supabase
+  const { data, error } = await createServerClient()
     .from('invitations')
     .select('data')
     .eq('id', uuid)

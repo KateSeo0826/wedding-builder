@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 import DoljanchiView from '@/components/doljanchi/DoljanchiView'
 import { notFound } from 'next/navigation'
 import { DoljanchiData } from '@/types/doljanchi'
@@ -10,7 +10,7 @@ export default async function DoljanchiPublicPage({
 }) {
   const { uuid } = await params
 
-  const { data, error } = await supabase
+  const { data, error } = await createServerClient()
     .from('invitations')
     .select('data')
     .eq('id', uuid)

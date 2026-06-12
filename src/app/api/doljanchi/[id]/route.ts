@@ -8,8 +8,8 @@ export async function PATCH(
 ) {
   const { id } = await params
   const body = await req.json() as { data: DoljanchiData; edit_token: string }
-  const { photos: _photos, ...dataWithoutPhotos } = body.data
-  void _photos
+  const photos = (body.data.photos ?? []).filter((u: string) => !u.startsWith('blob:'))
+  const dataWithoutPhotos = { ...body.data, photos }
 
   const db = createServerClient()
   const { data: existing, error: fetchErr } = await db
