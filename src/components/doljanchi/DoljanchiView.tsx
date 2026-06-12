@@ -73,7 +73,8 @@ export default function DoljanchiView({ data, isPreview }: Props) {
         background: '#FFFFFF',
         fontFamily: "'Noto Serif KR', serif",
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: s ? '20px 18px 20px' : '42px 28px 36px',
+        justifyContent: s ? undefined : 'center',
+        padding: s ? '32px 18px 24px' : '64px 28px 48px',
         boxSizing: 'border-box',
         position: 'relative', overflow: 'hidden',
       }}>
@@ -200,7 +201,8 @@ export default function DoljanchiView({ data, isPreview }: Props) {
         background: 'linear-gradient(145deg, #FFB0C8 0%, #F09AD2 45%, #CC96EE 100%)',
         fontFamily: "'Noto Sans KR', sans-serif",
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: s ? '18px 18px 20px' : '38px 28px 36px',
+        justifyContent: s ? undefined : 'center',
+        padding: s ? '28px 18px 24px' : '60px 28px 48px',
         boxSizing: 'border-box',
         position: 'relative', overflow: 'hidden',
       }}>
