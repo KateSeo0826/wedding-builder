@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useDoljanchiStore } from '@/lib/doljanchi-store'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 function getOrigin() {
   if (typeof window === 'undefined') return ''
@@ -70,7 +71,12 @@ export default function DoljanchiNav() {
   return (
     <>
       <nav className="h-14 flex items-center justify-between px-5 border-b border-zinc-100 bg-white flex-shrink-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-1 px-2 py-1.5 text-sm text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors">
+            <ArrowLeft size={15} />
+            홈
+          </Link>
+          <span className="text-zinc-200">|</span>
           <span className="text-base font-semibold text-zinc-900" style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>돌잔치</span>
           <span className="text-xs text-zinc-400 font-light">Builder</span>
         </div>

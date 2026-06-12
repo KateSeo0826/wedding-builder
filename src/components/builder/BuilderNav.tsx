@@ -1,7 +1,7 @@
 'use client'
 
 import { useStore } from '@/lib/store'
-import { Eye, Share2, Save } from 'lucide-react'
+import { Eye, Share2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -55,6 +55,11 @@ export default function BuilderNav() {
     <>
       <header className="h-14 bg-white border-b border-zinc-200 flex items-center justify-between px-5 flex-shrink-0 z-10">
         <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-1 px-2 py-1.5 text-sm text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors">
+            <ArrowLeft size={15} />
+            홈
+          </Link>
+          <span className="text-zinc-300">|</span>
           <Link href="/" className="font-serif italic text-zinc-800 text-lg tracking-tight">
             Wedding Builder
           </Link>
