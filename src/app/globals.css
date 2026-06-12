@@ -40,3 +40,19 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 2px; }
+
+@keyframes doljanchi-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.65); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes doljanchi-ring1 {
+  from { transform: translate(-50%, -50%) rotate(25deg); }
+  to   { transform: translate(-50%, -50%) rotate(385deg); }
+}
+@keyframes doljanchi-ring2 {
+  from { transform: translate(-50%, -50%) rotate(-20deg); }
+  to   { transform: translate(-50%, -50%) rotate(340deg); }
+}
+.doljanchi-star  { animation: doljanchi-twinkle 3s ease-in-out infinite; }
+.doljanchi-ring1 { animation: doljanchi-ring1 12s linear infinite; }
+.doljanchi-ring2 { animation: doljanchi-ring2 18s linear infinite; }
