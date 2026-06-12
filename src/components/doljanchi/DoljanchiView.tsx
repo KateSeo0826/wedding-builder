@@ -34,21 +34,37 @@ export default function DoljanchiView({ data, isPreview }: Props) {
 
   // ── Template 1: Happy First Birthday ──────────────────────────
   if (data.templateId === 'pink-bloom') {
-    const stars: { top?: string; left?: string; right?: string; bottom?: string; size: number; delay: string }[] = [
-      { top: '6%',  left: '5%',   size: s ? 9 : 14,  delay: '0s'   },
-      { top: '9%',  right: '7%',  size: s ? 11 : 17, delay: '0.7s' },
-      { top: '22%', left: '3%',   size: s ? 7 : 11,  delay: '1.4s' },
-      { top: '28%', right: '4%',  size: s ? 8 : 12,  delay: '0.3s' },
-      { top: '50%', left: '4%',   size: s ? 6 : 9,   delay: '1.8s' },
-      { top: '52%', right: '5%',  size: s ? 7 : 10,  delay: '1.1s' },
-      { bottom: '22%', left: '8%',  size: s ? 8 : 13, delay: '0.5s' },
-      { bottom: '20%', right: '9%', size: s ? 6 : 10, delay: '2.2s' },
-    ]
     const evtDate = data.eventDate ? new Date(data.eventDate) : null
     const mm = evtDate ? String(evtDate.getMonth() + 1).padStart(2, '0') : '--'
     const dd = evtDate ? String(evtDate.getDate()).padStart(2, '0') : '--'
-    const photoW = s ? 148 : 216
-    const photoH = s ? 188 : 274
+    const photoW = s ? 168 : 248
+    const photoH = s ? 214 : 316
+
+    // SVG orbital ring parameters (centered on photo)
+    const cx = photoW / 2
+    const cy = photoH / 2
+    const rx1 = Math.round(photoW * 0.87), ry1 = Math.round(photoH * 0.105)
+    const rx2 = Math.round(photoW * 0.71), ry2 = Math.round(photoH * 0.075)
+    // Circumference approximation
+    const c1 = Math.round(2 * Math.PI * Math.sqrt((rx1 ** 2 + ry1 ** 2) / 2)) + 6
+    const c2 = Math.round(2 * Math.PI * Math.sqrt((rx2 ** 2 + ry2 ** 2) / 2)) + 6
+    // SVG path for ellipse starting from top-center, going clockwise
+    const ep = (prx: number, pry: number) =>
+      `M${cx},${cy - pry} A${prx},${pry},0,1,1,${cx - 0.001},${cy - pry}`
+
+    // Stars scattered top-to-bottom with staggered delays (top appears first)
+    const cardStars: { top?: string; left?: string; right?: string; bottom?: string; sz: number; d: string }[] = [
+      { top: '3%',  left: '6%',   sz: s ? 9 : 14,  d: '0.05s' },
+      { top: '6%',  right: '7%',  sz: s ? 11 : 17, d: '0.15s' },
+      { top: '18%', left: '4%',   sz: s ? 7 : 11,  d: '0.4s'  },
+      { top: '24%', right: '5%',  sz: s ? 8 : 13,  d: '0.6s'  },
+      { top: '48%', left: '3%',   sz: s ? 6 : 9,   d: '1.1s'  },
+      { top: '54%', right: '4%',  sz: s ? 7 : 10,  d: '1.3s'  },
+      { bottom: '26%', left: '7%',  sz: s ? 8 : 12, d: '1.9s' },
+      { bottom: '22%', right: '8%', sz: s ? 6 : 9,  d: '2.1s' },
+      { bottom: '9%',  left: '11%', sz: s ? 7 : 10, d: '2.6s' },
+      { bottom: '7%',  right: '10%',sz: s ? 6 : 9,  d: '2.8s' },
+    ]
 
     return (
       <div style={{
@@ -57,21 +73,21 @@ export default function DoljanchiView({ data, isPreview }: Props) {
         background: '#FFFFFF',
         fontFamily: "'Noto Serif KR', serif",
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: s ? '22px 18px 20px' : '44px 28px 36px',
+        padding: s ? '20px 18px 20px' : '42px 28px 36px',
         boxSizing: 'border-box',
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* Scattered ✦ stars with twinkle animation */}
-        {stars.map((st, i) => (
+        {/* Stars — top-to-bottom appearance */}
+        {cardStars.map((st, i) => (
           <span key={i} className="doljanchi-star" style={{
             position: 'absolute', top: st.top, left: st.left, right: st.right, bottom: st.bottom,
-            color: '#1C2D6E', fontSize: st.size, lineHeight: 1, animationDelay: st.delay,
+            color: '#1C2D6E', fontSize: st.sz, lineHeight: 1, animationDelay: st.d,
           }}>✦</span>
         ))}
 
         {/* Title */}
         <div style={{
-          fontSize: s ? 13 : 20,
+          fontSize: s ? 14 : 22,
           fontFamily: "'DM Serif Display', serif",
           fontStyle: 'italic',
           color: '#1a1a1a',
@@ -83,14 +99,43 @@ export default function DoljanchiView({ data, isPreview }: Props) {
           Happy First Birthday
         </div>
 
-        {/* Oval portrait photo + navy date badge */}
+        {/* Oval portrait photo + SVG orbital rings + date badge */}
         <div style={{ position: 'relative', marginBottom: s ? 16 : 26, flexShrink: 0 }}>
+          {/* SVG orbital rings drawn from top, clockwise */}
+          <svg
+            width={photoW} height={photoH}
+            viewBox={`0 0 ${photoW} ${photoH}`}
+            style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%,-50%)',
+              overflow: 'visible', pointerEvents: 'none', zIndex: 0,
+            }}
+          >
+            {/* Outer ring with stars */}
+            <path d={ep(rx1, ry1)} fill="none"
+              stroke="rgba(28,45,110,0.38)" strokeWidth={s ? 1 : 1.5}
+              style={{ strokeDasharray: c1, strokeDashoffset: c1, animation: `svg-ring-draw 3s ease-out 0.2s forwards` }} />
+            {/* Inner ring */}
+            <path d={ep(rx2, ry2)} fill="none"
+              stroke="rgba(28,45,110,0.22)" strokeWidth={s ? 0.5 : 1}
+              style={{ strokeDasharray: c2, strokeDashoffset: c2, animation: `svg-ring-draw 2.8s ease-out 0.5s forwards` }} />
+            {/* Stars on ring — appear as ring is drawn (top→right→bottom→left) */}
+            <text x={cx} y={cy - ry1 - 4} fontSize={s ? 8 : 12} fill="rgba(28,45,110,0.75)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '0.3s' }}>✦</text>
+            <text x={cx + rx1 + 4} y={cy} fontSize={s ? 7 : 10} fill="rgba(28,45,110,0.6)" textAnchor="middle" dominantBaseline="middle" className="doljanchi-star" style={{ animationDelay: '1.0s' }}>✦</text>
+            <text x={cx} y={cy + ry1 + 8} fontSize={s ? 7 : 11} fill="rgba(28,45,110,0.65)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '1.7s' }}>✦</text>
+            <text x={cx - rx1 - 4} y={cy} fontSize={s ? 6 : 9} fill="rgba(28,45,110,0.5)" textAnchor="middle" dominantBaseline="middle" className="doljanchi-star" style={{ animationDelay: '2.4s' }}>✦</text>
+            <text x={cx + rx1 * 0.72} y={cy - ry1 * 0.68} fontSize={s ? 6 : 8} fill="rgba(28,45,110,0.45)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '0.7s' }}>✦</text>
+            <text x={cx - rx1 * 0.68} y={cy + ry1 * 0.72} fontSize={s ? 6 : 8} fill="rgba(28,45,110,0.4)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '2.1s' }}>✦</text>
+          </svg>
+
+          {/* Oval photo (above rings) */}
           <div style={{
             width: photoW, height: photoH,
             borderRadius: '50%',
             overflow: 'hidden',
             background: '#e0e0e0',
-            boxShadow: '0 6px 24px rgba(0,0,0,0.10)',
+            boxShadow: '0 6px 28px rgba(0,0,0,0.12)',
+            position: 'relative', zIndex: 1,
           }}>
             {photo
               ? <img src={photo} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} alt="" />
@@ -100,32 +145,32 @@ export default function DoljanchiView({ data, isPreview }: Props) {
           {/* Navy date badge */}
           <div style={{
             position: 'absolute', bottom: s ? -8 : -12, right: s ? -10 : -16,
-            width: s ? 46 : 68, height: s ? 46 : 68,
+            width: s ? 50 : 72, height: s ? 50 : 72,
             borderRadius: '50%', background: '#1C2D6E',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 4px 14px rgba(28,45,110,0.35)', zIndex: 2,
           }}>
-            <span style={{ fontSize: s ? 10 : 14, color: '#fff', fontWeight: 700, lineHeight: 1, fontFamily: "'Noto Sans KR', sans-serif" }}>{mm}</span>
-            <div style={{ width: s ? 18 : 26, height: 0.5, background: 'rgba(255,255,255,0.45)', margin: `${s ? 2 : 3}px 0` }} />
-            <span style={{ fontSize: s ? 10 : 14, color: '#fff', fontWeight: 700, lineHeight: 1, fontFamily: "'Noto Sans KR', sans-serif" }}>{dd}</span>
+            <span style={{ fontSize: s ? 11 : 15, color: '#fff', fontWeight: 700, lineHeight: 1, fontFamily: "'Noto Sans KR', sans-serif" }}>{mm}</span>
+            <div style={{ width: s ? 20 : 28, height: 0.5, background: 'rgba(255,255,255,0.45)', margin: `${s ? 2 : 3}px 0` }} />
+            <span style={{ fontSize: s ? 11 : 15, color: '#fff', fontWeight: 700, lineHeight: 1, fontFamily: "'Noto Sans KR', sans-serif" }}>{dd}</span>
           </div>
         </div>
 
         {/* Baby name */}
         <div style={{
-          fontSize: s ? 22 : 34, fontWeight: 700, color: '#111111',
-          letterSpacing: '0.02em', marginBottom: s ? 8 : 12,
+          fontSize: s ? 26 : 40, fontWeight: 700, color: '#111111',
+          letterSpacing: '0.02em', marginBottom: s ? 8 : 14,
           textAlign: 'center', position: 'relative', zIndex: 1,
         }}>{data.babyName}</div>
 
-        <div style={{ fontSize: s ? 10 : 14, color: '#444', marginBottom: s ? 3 : 5, textAlign: 'center' }}>{fmtFull(data.eventDate)}</div>
-        <div style={{ fontSize: s ? 10 : 13, color: '#666', marginBottom: s ? 3 : 5, textAlign: 'center' }}>{fmtTime(data.eventTime)}</div>
-        <div style={{ fontSize: s ? 10 : 13, color: '#777', marginBottom: s ? 8 : 12, textAlign: 'center' }}>{data.venueName}</div>
+        <div style={{ fontSize: s ? 11 : 16, color: '#444', marginBottom: s ? 4 : 6, textAlign: 'center' }}>{fmtFull(data.eventDate)}</div>
+        <div style={{ fontSize: s ? 11 : 15, color: '#666', marginBottom: s ? 4 : 6, textAlign: 'center' }}>{fmtTime(data.eventTime)}</div>
+        <div style={{ fontSize: s ? 11 : 15, color: '#777', marginBottom: s ? 10 : 16, textAlign: 'center' }}>{data.venueName}</div>
 
         {(data.fatherName || data.motherName) && (
-          <div style={{ display: 'flex', gap: s ? 18 : 28, fontSize: s ? 9 : 12, color: '#888', position: 'relative', zIndex: 1 }}>
-            {data.fatherName && <span><span style={{ opacity: 0.55, marginRight: 3 }}>아빠</span>{data.fatherName}</span>}
-            {data.motherName && <span><span style={{ opacity: 0.55, marginRight: 3 }}>엄마</span>{data.motherName}</span>}
+          <div style={{ display: 'flex', gap: s ? 20 : 32, fontSize: s ? 10 : 14, color: '#888', position: 'relative', zIndex: 1 }}>
+            {data.fatherName && <span><span style={{ opacity: 0.55, marginRight: 4 }}>아빠</span>{data.fatherName}</span>}
+            {data.motherName && <span><span style={{ opacity: 0.55, marginRight: 4 }}>엄마</span>{data.motherName}</span>}
           </div>
         )}
       </div>
@@ -134,65 +179,79 @@ export default function DoljanchiView({ data, isPreview }: Props) {
 
   // ── Template 2: First Birthday (pink gradient, arch photo, orbital rings) ──
   if (data.templateId === 'first-year') {
-    const photoW = s ? 148 : 208
-    const photoH = s ? 186 : 260
+    const photoW = s ? 158 : 225
+    const photoH = s ? 202 : 288
     const archR = photoW / 2
+
+    // SVG orbital ring params (centered on arch photo)
+    const cx = photoW / 2
+    const cy = photoH * 0.5
+    const rx1 = Math.round(photoW * 0.82), ry1 = Math.round(photoH * 0.13)
+    const rx2 = Math.round(photoW * 0.68), ry2 = Math.round(photoH * 0.20)
+    const c1 = Math.round(2 * Math.PI * Math.sqrt((rx1 ** 2 + ry1 ** 2) / 2)) + 6
+    const c2 = Math.round(2 * Math.PI * Math.sqrt((rx2 ** 2 + ry2 ** 2) / 2)) + 6
+    const ep = (prx: number, pry: number) =>
+      `M${cx},${cy - pry} A${prx},${pry},0,1,1,${cx - 0.001},${cy - pry}`
 
     return (
       <div style={{
         minHeight: s ? undefined : '100svh',
         height: s ? '100%' : undefined,
-        background: 'linear-gradient(145deg, #FFB3C6 0%, #F2A0D2 45%, #D4A0EE 100%)',
+        background: 'linear-gradient(145deg, #FFB0C8 0%, #F09AD2 45%, #CC96EE 100%)',
         fontFamily: "'Noto Sans KR', sans-serif",
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: s ? '20px 18px 20px' : '40px 28px 36px',
+        padding: s ? '18px 18px 20px' : '38px 28px 36px',
         boxSizing: 'border-box',
         position: 'relative', overflow: 'hidden',
       }}>
         {/* FIRST BIRTHDAY header */}
-        <div style={{ textAlign: 'center', marginBottom: s ? 14 : 22, position: 'relative', zIndex: 1 }}>
+        <div style={{ textAlign: 'center', marginBottom: s ? 12 : 20, position: 'relative', zIndex: 1 }}>
           <div style={{
-            fontSize: s ? 11 : 16, fontWeight: 600,
-            color: 'rgba(255,255,255,0.92)',
+            fontSize: s ? 12 : 18, fontWeight: 700,
+            color: 'rgba(255,255,255,0.95)',
             letterSpacing: '0.22em', textTransform: 'uppercase' as const,
-            lineHeight: 1.65,
+            lineHeight: 1.6,
           }}>
             FIRST BIRTHDAY<br />FIRST BIRTHDAY
           </div>
         </div>
 
-        {/* Arch photo + orbital rings */}
-        <div style={{ position: 'relative', marginBottom: s ? 14 : 22, flexShrink: 0 }}>
-          {/* Ring 1 — slow rotation */}
-          <div className="doljanchi-ring1" style={{
-            position: 'absolute', top: '50%', left: '50%',
-            width: photoW * 1.5, height: photoW * 0.36,
-            border: `${s ? 1 : 1.5}px solid rgba(255,255,255,0.65)`,
-            borderRadius: '50%',
-            pointerEvents: 'none',
-          }} />
-          {/* Ring 2 — slower, different angle */}
-          <div className="doljanchi-ring2" style={{
-            position: 'absolute', top: '50%', left: '50%',
-            width: photoW * 1.3, height: photoW * 0.44,
-            border: `${s ? 1 : 1.5}px solid rgba(255,255,255,0.4)`,
-            borderRadius: '50%',
-            pointerEvents: 'none',
-          }} />
+        {/* Arch photo + SVG orbital rings */}
+        <div style={{ position: 'relative', marginBottom: s ? 12 : 20, flexShrink: 0 }}>
+          {/* SVG orbital rings with draw animation */}
+          <svg
+            width={photoW} height={photoH}
+            viewBox={`0 0 ${photoW} ${photoH}`}
+            style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%,-50%)',
+              overflow: 'visible', pointerEvents: 'none', zIndex: 0,
+            }}
+          >
+            {/* Outer ring — flat ellipse (Saturn-like) */}
+            <path d={ep(rx1, ry1)} fill="none"
+              stroke="rgba(255,255,255,0.7)" strokeWidth={s ? 1 : 1.5}
+              style={{ strokeDasharray: c1, strokeDashoffset: c1, animation: `svg-ring-draw 3s ease-out 0.2s forwards` }} />
+            {/* Inner ring — more circular */}
+            <path d={ep(rx2, ry2)} fill="none"
+              stroke="rgba(255,255,255,0.4)" strokeWidth={s ? 1 : 1.5}
+              style={{ strokeDasharray: c2, strokeDashoffset: c2, animation: `svg-ring-draw 2.8s ease-out 0.5s forwards` }} />
+            {/* Stars on rings */}
+            <text x={cx} y={cy - ry1 - 4} fontSize={s ? 9 : 13} fill="rgba(255,255,255,0.9)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '0.3s' }}>✦</text>
+            <text x={cx + rx1 + 4} y={cy} fontSize={s ? 8 : 11} fill="rgba(255,255,255,0.75)" textAnchor="middle" dominantBaseline="middle" className="doljanchi-star" style={{ animationDelay: '1.0s' }}>✦</text>
+            <text x={cx} y={cy + ry1 + 8} fontSize={s ? 7 : 10} fill="rgba(255,255,255,0.65)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '1.7s' }}>✦</text>
+            <text x={cx - rx1 - 4} y={cy} fontSize={s ? 7 : 10} fill="rgba(255,255,255,0.6)" textAnchor="middle" dominantBaseline="middle" className="doljanchi-star" style={{ animationDelay: '2.4s' }}>✦</text>
+            <text x={cx + rx2 * 0.73} y={cy - ry2 * 0.68} fontSize={s ? 6 : 9} fill="rgba(255,255,255,0.55)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '0.8s' }}>★</text>
+            <text x={cx - rx2 * 0.68} y={cy + ry2 * 0.73} fontSize={s ? 6 : 9} fill="rgba(255,255,255,0.5)" textAnchor="middle" className="doljanchi-star" style={{ animationDelay: '2.2s' }}>★</text>
+          </svg>
 
-          {/* Stars near rings with twinkle */}
-          <span className="doljanchi-star" style={{ position: 'absolute', top: '18%', right: s ? -14 : -20, fontSize: s ? 8 : 11, color: 'rgba(255,255,255,0.9)', animationDelay: '0.5s', zIndex: 3 }}>✦</span>
-          <span className="doljanchi-star" style={{ position: 'absolute', bottom: '30%', left: s ? -12 : -18, fontSize: s ? 7 : 10, color: 'rgba(255,255,255,0.75)', animationDelay: '1.5s', zIndex: 3 }}>✦</span>
-          <span className="doljanchi-star" style={{ position: 'absolute', top: '60%', right: s ? -9 : -13, fontSize: s ? 6 : 9, color: 'rgba(255,255,255,0.65)', animationDelay: '1s', zIndex: 3 }}>★</span>
-          <span className="doljanchi-star" style={{ position: 'absolute', top: '5%', left: s ? -8 : -12, fontSize: s ? 6 : 8, color: 'rgba(255,255,255,0.6)', animationDelay: '2s', zIndex: 3 }}>✦</span>
-
-          {/* Arch photo frame */}
+          {/* Arch photo frame (zIndex 1 hides ring center, rings peek out sides) */}
           <div style={{
             width: photoW, height: photoH,
             borderRadius: `${archR}px ${archR}px 0 0`,
             overflow: 'hidden',
             background: 'rgba(255,255,255,0.2)',
-            border: `${s ? 2 : 3}px solid rgba(255,255,255,0.7)`,
+            border: `${s ? 2 : 3}px solid rgba(255,255,255,0.75)`,
             boxSizing: 'border-box',
             position: 'relative', zIndex: 1,
           }}>
@@ -205,7 +264,7 @@ export default function DoljanchiView({ data, isPreview }: Props) {
 
         {/* Baby name */}
         <div style={{
-          fontSize: s ? 26 : 40,
+          fontSize: s ? 30 : 46,
           fontFamily: "'Cormorant Garamond', serif",
           fontStyle: 'italic',
           fontWeight: 400,
@@ -213,32 +272,32 @@ export default function DoljanchiView({ data, isPreview }: Props) {
           letterSpacing: '0.04em',
           lineHeight: 1.15,
           textAlign: 'center',
-          textShadow: '0 2px 10px rgba(180,60,140,0.3)',
-          marginBottom: s ? 5 : 8,
+          textShadow: '0 2px 12px rgba(180,60,140,0.35)',
+          marginBottom: s ? 6 : 10,
           position: 'relative', zIndex: 1,
         }}>{data.babyName}</div>
 
         {/* Date pill */}
         <div style={{
           display: 'inline-block',
-          background: 'rgba(255,255,255,0.22)',
-          border: '1px solid rgba(255,255,255,0.5)',
+          background: 'rgba(255,255,255,0.25)',
+          border: '1px solid rgba(255,255,255,0.55)',
           borderRadius: 20,
-          padding: s ? '3px 12px' : '4px 18px',
-          fontSize: s ? 9 : 12, color: '#fff',
+          padding: s ? '3px 14px' : '5px 20px',
+          fontSize: s ? 10 : 14, color: '#fff',
           letterSpacing: '0.06em',
-          marginBottom: s ? 10 : 14,
+          marginBottom: s ? 10 : 16,
           position: 'relative', zIndex: 1,
         }}>{fmt(data.eventDate)}</div>
 
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: s ? 10 : 13, color: 'rgba(255,255,255,0.85)', marginBottom: 3 }}>{fmtFull(data.eventDate)}</div>
-          <div style={{ fontSize: s ? 10 : 12, color: 'rgba(255,255,255,0.75)', marginBottom: 3 }}>{fmtTime(data.eventTime)}</div>
-          <div style={{ fontSize: s ? 10 : 12, color: 'rgba(255,255,255,0.7)', marginBottom: s ? 8 : 12 }}>{data.venueName}</div>
+          <div style={{ fontSize: s ? 11 : 15, color: 'rgba(255,255,255,0.88)', marginBottom: 4 }}>{fmtFull(data.eventDate)}</div>
+          <div style={{ fontSize: s ? 11 : 14, color: 'rgba(255,255,255,0.78)', marginBottom: 4 }}>{fmtTime(data.eventTime)}</div>
+          <div style={{ fontSize: s ? 11 : 14, color: 'rgba(255,255,255,0.72)', marginBottom: s ? 10 : 16 }}>{data.venueName}</div>
           {(data.fatherName || data.motherName) && (
-            <div style={{ display: 'flex', gap: s ? 16 : 24, fontSize: s ? 9 : 11, color: 'rgba(255,255,255,0.65)', justifyContent: 'center' }}>
-              {data.fatherName && <span><span style={{ opacity: 0.7, marginRight: 2 }}>아빠</span>{data.fatherName}</span>}
-              {data.motherName && <span><span style={{ opacity: 0.7, marginRight: 2 }}>엄마</span>{data.motherName}</span>}
+            <div style={{ display: 'flex', gap: s ? 18 : 28, fontSize: s ? 10 : 13, color: 'rgba(255,255,255,0.68)', justifyContent: 'center' }}>
+              {data.fatherName && <span><span style={{ opacity: 0.75, marginRight: 3 }}>아빠</span>{data.fatherName}</span>}
+              {data.motherName && <span><span style={{ opacity: 0.75, marginRight: 3 }}>엄마</span>{data.motherName}</span>}
             </div>
           )}
         </div>
