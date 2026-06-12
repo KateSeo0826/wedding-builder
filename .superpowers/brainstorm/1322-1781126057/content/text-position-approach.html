@@ -1,0 +1,102 @@
+<h2>글씨 위치 조정 — 어떤 방식이 좋을까요?</h2>
+<p class="subtitle">히어로 섹션에 있는 레터링 텍스트 블록의 위치를 조정하는 방법</p>
+
+<div class="cards" style="grid-template-columns: repeat(3, 1fr);">
+
+  <!-- Option A: Drag in preview -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f4f4f5; padding:16px; border-radius:8px; position:relative; height:180px; overflow:hidden;">
+      <!-- Phone mockup -->
+      <div style="width:90px; height:160px; background:#1a1a1a; border-radius:14px; margin:0 auto; position:relative; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.25);">
+        <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2d1b4e,#7c3f7f);"></div>
+        <!-- Draggable text block -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;cursor:move;border:2px dashed rgba(255,255,255,0.7);border-radius:6px;padding:6px 10px;">
+          <div style="color:#fff;font-size:6px;font-style:italic;opacity:0.85;">We're getting Married!</div>
+          <div style="color:#fff;font-size:9px;font-weight:600;margin-top:2px;">수용 ♥ 동미</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:5px;margin-top:2px;">2026년 5월 3일</div>
+        </div>
+        <!-- Drag hint arrows -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;">
+          <div style="position:absolute;top:-28px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:10px;">↑</div>
+          <div style="position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:10px;">↓</div>
+          <div style="position:absolute;top:50%;left:-22px;transform:translateY(-50%);color:rgba(255,255,255,0.5);font-size:10px;">←</div>
+          <div style="position:absolute;top:50%;right:-22px;transform:translateY(-50%);color:rgba(255,255,255,0.5);font-size:10px;">→</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 드래그로 직접 이동</h3>
+      <p>미리보기에서 글씨 블록을 클릭해 원하는 위치로 드래그. 가장 직관적이고 Canva 방식.</p>
+      <div class="pros-cons" style="margin-top:8px;font-size:12px;">
+        <div class="pros"><h4>장점</h4><ul><li>WYSIWYG</li><li>자유로운 배치</li></ul></div>
+        <div class="cons"><h4>단점</h4><ul><li>구현 복잡</li><li>모바일 터치 처리 필요</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Sliders in edit panel -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f4f4f5; padding:16px; border-radius:8px; height:180px; display:flex; flex-direction:column; justify-content:center; gap:12px;">
+      <div style="background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        <div style="font-size:10px;color:#888;margin-bottom:4px;font-weight:600;">세로 위치</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:9px;color:#aaa;">상단</span>
+          <div style="flex:1;height:4px;background:#e5e5e5;border-radius:2px;position:relative;">
+            <div style="width:65%;height:100%;background:#6366f1;border-radius:2px;"></div>
+            <div style="position:absolute;left:65%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;background:#6366f1;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+          </div>
+          <span style="font-size:9px;color:#aaa;">하단</span>
+        </div>
+        <div style="text-align:right;font-size:9px;color:#6366f1;margin-top:2px;">65%</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        <div style="font-size:10px;color:#888;margin-bottom:4px;font-weight:600;">가로 정렬</div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;padding:5px;border:2px solid #e5e5e5;border-radius:6px;text-align:center;font-size:9px;color:#aaa;">왼쪽</div>
+          <div style="flex:1;padding:5px;border:2px solid #6366f1;border-radius:6px;text-align:center;font-size:9px;color:#6366f1;background:#eef2ff;font-weight:600;">가운데</div>
+          <div style="flex:1;padding:5px;border:2px solid #e5e5e5;border-radius:6px;text-align:center;font-size:9px;color:#aaa;">오른쪽</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 슬라이더 + 정렬 버튼</h3>
+      <p>편집 패널에 세로 위치 슬라이더(%)와 가로 정렬 버튼(좌/중/우) 추가. 정밀하고 간단.</p>
+      <div class="pros-cons" style="margin-top:8px;font-size:12px;">
+        <div class="pros"><h4>장점</h4><ul><li>구현 간단</li><li>정확한 수치 제어</li></ul></div>
+        <div class="cons"><h4>단점</h4>
+        <ul><li>미리보기와 분리됨</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: 9-grid picker -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f4f4f5; padding:16px; border-radius:8px; height:180px; display:flex; align-items:center; justify-content:center;">
+      <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        <div style="font-size:10px;color:#888;margin-bottom:10px;font-weight:600;text-align:center;">텍스트 위치</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:108px;">
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↖</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↑</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↗</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">←</div>
+          <div style="width:32px;height:32px;border:1px solid #6366f1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#6366f1;background:#eef2ff;cursor:pointer;font-weight:700;">●</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">→</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↙</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↓</div>
+          <div style="width:32px;height:32px;border:1px solid #e5e5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ccc;cursor:pointer;">↘</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 9칸 그리드 위치 선택</h3>
+      <p>상/중/하 × 좌/중/우 조합 9개 중 선택. 빠르고 깔끔하지만 세밀한 조정은 불가.</p>
+      <div class="pros-cons" style="margin-top:8px;font-size:12px;">
+        <div class="pros"><h4>장점</h4><ul><li>매우 간단</li><li>실수 없는 배치</li></ul></div>
+        <div class="cons"><h4>단점</h4><ul><li>9가지로 제한됨</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="margin-top:16px;font-size:13px;color:#888;text-align:center;">클릭해서 선택하거나, 터미널에서 A/B/C로 알려주세요.</p>
