@@ -172,7 +172,7 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
           <div style={{
             fontFamily: 'DM Serif Display, serif',
             fontSize: isPreview ? 26 : 42,
-            color: heroPhoto ? '#fff' : tpl.textColor,
+            color: data.letteringColor || (heroPhoto ? '#fff' : tpl.textColor),
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
           }}>
@@ -183,7 +183,7 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
           <div style={{
             marginTop: 10,
             fontSize: isPreview ? 10 : 13,
-            color: heroPhoto ? 'rgba(255,255,255,0.85)' : tpl.textColor,
+            color: data.letteringColor || (heroPhoto ? 'rgba(255,255,255,0.85)' : tpl.textColor),
             letterSpacing: '0.12em',
             opacity: 0.8,
           }}>
