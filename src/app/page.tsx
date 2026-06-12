@@ -91,14 +91,20 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CTA */}
+          {/* Two CTAs */}
           <div className="w-full max-w-xs space-y-3">
             <Link
               href="/edit/draft"
-              className="group inline-flex items-center justify-center w-full py-4 px-8 bg-zinc-900 text-white rounded-2xl text-base font-semibold tracking-tight hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20 active:scale-[0.98]"
-              style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
+              className="group inline-flex items-center justify-center w-full py-4 px-8 bg-zinc-900 text-white rounded-2xl text-sm font-semibold tracking-tight hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20 active:scale-[0.98]"
             >
-              청첩장 만들기
+              💍 청첩장 만들기
+              <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
+            </Link>
+            <Link
+              href="/doljanchi/edit/draft"
+              className="group inline-flex items-center justify-center w-full py-4 px-8 bg-rose-400 text-white rounded-2xl text-sm font-semibold tracking-tight hover:bg-rose-500 transition-all shadow-lg shadow-rose-400/20 active:scale-[0.98]"
+            >
+              🎂 돌잔치 초대장 만들기
               <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
             </Link>
             <p className="text-zinc-400 text-xs">신용카드 · 회원가입 필요 없음</p>
