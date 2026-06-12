@@ -8,7 +8,42 @@ interface Props {
   data: InvitationData
   isPreview?: boolean
   isDragMode?: boolean
-  onPositionChange?: (x: number, y: number) => void
+  onPositionChange?: (target: 'top' | 'names' | 'date', x: number, y: number) => void
+}
+
+function makeDragHandler(
+  heroRef: React.RefObject<HTMLElement | null>,
+  elemRef: React.RefObject<HTMLDivElement | null>,
+  target: 'top' | 'names' | 'date',
+  onPositionChange: Props['onPositionChange'],
+  isDragMode: boolean,
+) {
+  return (e: React.MouseEvent) => {
+    if (!isDragMode || !heroRef.current || !elemRef.current || !onPositionChange) return
+    e.preventDefault()
+    const lr = elemRef.current.getBoundingClientRect()
+    const ox = e.clientX - (lr.left + lr.width / 2)
+    const oy = e.clientY - (lr.top + lr.height / 2)
+    let active = true
+
+    const onMove = (ev: MouseEvent) => {
+      if (!active || !heroRef.current || !elemRef.current) return
+      const hr = heroRef.current.getBoundingClientRect()
+      const el = elemRef.current.getBoundingClientRect()
+      const cx = Math.max(el.width / 2, Math.min(hr.width - el.width / 2, ev.clientX - ox - hr.left))
+      const cy = Math.max(el.height / 2, Math.min(hr.height - el.height / 2, ev.clientY - oy - hr.top))
+      onPositionChange(target, Math.round((cx / hr.width) * 100), Math.round((cy / hr.height) * 100))
+    }
+    const onUp = () => {
+      active = false
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      window.removeEventListener('mouseleave', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    window.addEventListener('mouseleave', onUp)
+  }
 }
 
 function formatDate(dateStr: string) {
@@ -27,55 +62,13 @@ function formatTime(timeStr: string) {
 
 export default function InvitationView({ data, isPreview, isDragMode, onPositionChange }: Props) {
   const heroRef = useRef<HTMLElement>(null)
-  const letteringRef = useRef<HTMLDivElement>(null)
-  const isDragging = useRef(false)
-  const dragOffset = useRef({ x: 0, y: 0 })
+  const topRef = useRef<HTMLDivElement>(null)
+  const namesRef = useRef<HTMLDivElement>(null)
+  const dateRef = useRef<HTMLDivElement>(null)
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isDragMode || !heroRef.current || !letteringRef.current || !onPositionChange) return
-    e.preventDefault()
-
-    const lr = letteringRef.current.getBoundingClientRect()
-
-    // 포인터와 레터링 중심 사이의 오프셋 기록
-    dragOffset.current = {
-      x: e.clientX - (lr.left + lr.width / 2),
-      y: e.clientY - (lr.top + lr.height / 2),
-    }
-    isDragging.current = true
-
-    const onMove = (ev: MouseEvent) => {
-      if (!isDragging.current || !heroRef.current || !letteringRef.current) return
-      const hr = heroRef.current.getBoundingClientRect()
-      const lr = letteringRef.current.getBoundingClientRect()
-      const halfW = lr.width / 2
-      const halfH = lr.height / 2
-
-      // 히어로 기준 새 중심 좌표 (포인터 - 오프셋 - 히어로 원점)
-      const rawX = ev.clientX - dragOffset.current.x - hr.left
-      const rawY = ev.clientY - dragOffset.current.y - hr.top
-
-      // 히어로 영역 내로 clamp (블록 절반 크기만큼 여백)
-      const cx = Math.max(halfW, Math.min(hr.width - halfW, rawX))
-      const cy = Math.max(halfH, Math.min(hr.height - halfH, rawY))
-
-      onPositionChange(
-        Math.round((cx / hr.width) * 100),
-        Math.round((cy / hr.height) * 100),
-      )
-    }
-
-    const onUp = () => {
-      isDragging.current = false
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-      window.removeEventListener('mouseleave', onUp)
-    }
-
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-    window.addEventListener('mouseleave', onUp)
-  }
+  const handleTopDown = makeDragHandler(heroRef, topRef, 'top', onPositionChange, !!isDragMode)
+  const handleNamesDown = makeDragHandler(heroRef, namesRef, 'names', onPositionChange, !!isDragMode)
+  const handleDateDown = makeDragHandler(heroRef, dateRef, 'date', onPositionChange, !!isDragMode)
 
   const tpl = TEMPLATES.find((t) => t.id === data.templateId) ?? TEMPLATES[0]
   const accent = data.accentColor || tpl.accentColor
@@ -128,47 +121,62 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
             ? 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)'
             : 'none',
         }} />
-        {/* Lettering */}
-        <div
-          ref={letteringRef}
-          style={{
-            position: 'absolute',
-            ...(data.letteringPosition
-              ? {
-                  left: `${data.letteringPosition.x}%`,
-                  top: `${data.letteringPosition.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                }
-              : {
-                  bottom: 40,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                }
-            ),
-            textAlign: 'center',
-            zIndex: 1,
-            cursor: isDragMode ? 'move' : 'default',
-            outline: isDragMode ? '2px dashed rgba(255,255,255,0.6)' : 'none',
-            outlineOffset: 6,
-            borderRadius: 4,
-            padding: isDragMode ? '6px 10px' : 0,
-            userSelect: 'none',
-          }}
-          onMouseDown={handleMouseDown}
-        >
-          {data.letteringText && (
+        {/* Lettering — top text */}
+        {data.letteringText && (
+          <div
+            ref={topRef}
+            style={{
+              position: 'absolute',
+              ...(data.letteringTopPosition
+                ? { left: `${data.letteringTopPosition.x}%`, top: `${data.letteringTopPosition.y}%`, transform: 'translate(-50%, -50%)' }
+                : { bottom: isPreview ? 90 : 110, left: '50%', transform: 'translateX(-50%)' }
+              ),
+              textAlign: 'center',
+              zIndex: 1,
+              cursor: isDragMode ? 'move' : 'default',
+              outline: isDragMode ? '2px dashed rgba(255,255,255,0.6)' : 'none',
+              outlineOffset: 4,
+              borderRadius: 4,
+              padding: isDragMode ? '4px 8px' : 0,
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseDown={handleTopDown}
+          >
             <div style={{
               fontFamily: 'DM Serif Display, serif',
               fontStyle: 'italic',
               fontSize: isPreview ? 13 : 18,
               color: data.letteringColor || (heroPhoto ? '#fff' : accent),
               letterSpacing: '0.04em',
-              marginBottom: 12,
               opacity: 0.9,
             }}>
               {data.letteringText}
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Lettering — names */}
+        <div
+          ref={namesRef}
+          style={{
+            position: 'absolute',
+            ...(data.letteringNamesPosition
+              ? { left: `${data.letteringNamesPosition.x}%`, top: `${data.letteringNamesPosition.y}%`, transform: 'translate(-50%, -50%)' }
+              : { bottom: isPreview ? 56 : 64, left: '50%', transform: 'translateX(-50%)' }
+            ),
+            textAlign: 'center',
+            zIndex: 1,
+            cursor: isDragMode ? 'move' : 'default',
+            outline: isDragMode ? '2px dashed rgba(255,255,255,0.6)' : 'none',
+            outlineOffset: 4,
+            borderRadius: 4,
+            padding: isDragMode ? '4px 8px' : 0,
+            userSelect: 'none',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseDown={handleNamesDown}
+        >
           <div style={{
             fontFamily: 'DM Serif Display, serif',
             fontSize: isPreview ? 26 : 42,
@@ -180,8 +188,30 @@ export default function InvitationView({ data, isPreview, isDragMode, onPosition
             <span style={{ fontSize: '0.5em', opacity: 0.7, margin: '0 8px' }}>♥</span>
             {data.bride.name}
           </div>
+        </div>
+
+        {/* Lettering — date/time */}
+        <div
+          ref={dateRef}
+          style={{
+            position: 'absolute',
+            ...(data.letteringDatePosition
+              ? { left: `${data.letteringDatePosition.x}%`, top: `${data.letteringDatePosition.y}%`, transform: 'translate(-50%, -50%)' }
+              : { bottom: isPreview ? 36 : 40, left: '50%', transform: 'translateX(-50%)' }
+            ),
+            textAlign: 'center',
+            zIndex: 1,
+            cursor: isDragMode ? 'move' : 'default',
+            outline: isDragMode ? '2px dashed rgba(255,255,255,0.6)' : 'none',
+            outlineOffset: 4,
+            borderRadius: 4,
+            padding: isDragMode ? '4px 8px' : 0,
+            userSelect: 'none',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseDown={handleDateDown}
+        >
           <div style={{
-            marginTop: 10,
             fontSize: isPreview ? 10 : 13,
             color: data.letteringColor || (heroPhoto ? 'rgba(255,255,255,0.85)' : tpl.textColor),
             letterSpacing: '0.12em',

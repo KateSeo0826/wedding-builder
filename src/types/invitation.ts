@@ -40,7 +40,10 @@ export interface InvitationData {
   letteringText: string
   letteringColor: string
   accentColor: string
-  letteringPosition: { x: number; y: number } | null   // 히어로 내 % 좌표, null = 기본(하단 중앙)
+  letteringPosition: { x: number; y: number } | null
+  letteringTopPosition: { x: number; y: number } | null
+  letteringNamesPosition: { x: number; y: number } | null
+  letteringDatePosition: { x: number; y: number } | null
 
   // 공유
   uuid: string

@@ -28,7 +28,11 @@ export default function PreviewPanel() {
             data={data}
             isPreview
             isDragMode={activeSection === 'lettering'}
-            onPositionChange={(x, y) => update({ letteringPosition: { x, y } })}
+            onPositionChange={(target, x, y) => {
+              if (target === 'top') update({ letteringTopPosition: { x, y } })
+              else if (target === 'names') update({ letteringNamesPosition: { x, y } })
+              else update({ letteringDatePosition: { x, y } })
+            }}
           />
         </div>
       </div>

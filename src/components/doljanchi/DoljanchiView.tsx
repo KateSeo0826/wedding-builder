@@ -101,15 +101,20 @@ interface Props {
   isPreview?: boolean
 }
 
+function parseLocalDate(dateStr: string) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
 function fmt(dateStr: string) {
   if (!dateStr) return ''
-  const d = new Date(dateStr)
+  const d = parseLocalDate(dateStr)
   return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
 function fmtFull(dateStr: string) {
   if (!dateStr) return ''
-  const d = new Date(dateStr)
+  const d = parseLocalDate(dateStr)
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 }
 
@@ -127,7 +132,7 @@ export default function DoljanchiView({ data, isPreview }: Props) {
 
   // ── Template 1: Happy First Birthday ──────────────────────────
   if (data.templateId === 'pink-bloom') {
-    const evtDate = data.eventDate ? new Date(data.eventDate) : null
+    const evtDate = data.eventDate ? parseLocalDate(data.eventDate) : null
     const mm = evtDate ? String(evtDate.getMonth() + 1).padStart(2, '0') : '--'
     const dd = evtDate ? String(evtDate.getDate()).padStart(2, '0') : '--'
     const photoW = s ? 168 : 248
@@ -386,7 +391,7 @@ export default function DoljanchiView({ data, isPreview }: Props) {
 
   // ── Template 3: Happy Day (sky blue card, wavy canvas lines, oval photo) ────
   if (data.templateId === 'happy-day') {
-    const evtDate = data.eventDate ? new Date(data.eventDate) : null
+    const evtDate = data.eventDate ? parseLocalDate(data.eventDate) : null
     const mm = evtDate ? String(evtDate.getMonth() + 1).padStart(2, '0') : '--'
     const dd = evtDate ? String(evtDate.getDate()).padStart(2, '0') : '--'
     const photoW = s ? 130 : 190
@@ -642,7 +647,7 @@ export default function DoljanchiView({ data, isPreview }: Props) {
         <div style={{ fontSize: s ? 8 : 11, letterSpacing: '0.22em', color: '#A0785A', textTransform: 'uppercase' as const, marginBottom: s ? 6 : 10, opacity: 0.8 }}>Invitation</div>
         <div style={{ fontSize: s ? 28 : 44, color: '#5C4033', lineHeight: 1, letterSpacing: '-0.01em' }}>{fmt(data.eventDate)}</div>
         <div style={{ fontSize: s ? 11 : 16, color: '#5C4033', opacity: 0.5, letterSpacing: '0.08em', marginBottom: s ? 6 : 10 }}>
-          {data.eventDate ? new Date(data.eventDate).getFullYear() : ''}
+          {data.eventDate ? parseLocalDate(data.eventDate).getFullYear() : ''}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '60%', margin: '0 auto' }}>
           <div style={{ flex: 1, height: 1, background: '#A0785A', opacity: 0.4 }} />
